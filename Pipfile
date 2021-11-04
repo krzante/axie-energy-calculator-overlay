@@ -4,9 +4,12 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+numpy = "*"
 pillow = "*"
 overlay = "*"
-numpy = "*"
+pyglet = "*"
+pynput = "*"
+auto-py-to-exe = "*"
 
 [dev-packages]
 
