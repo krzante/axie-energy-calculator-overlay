@@ -10,6 +10,7 @@ overlay = "*"
 pyglet = "*"
 pynput = "*"
 auto-py-to-exe = "*"
+asteval = "*"
 
 [dev-packages]
 
