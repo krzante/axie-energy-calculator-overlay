@@ -130,6 +130,7 @@ def on_press(key):
 tab2_data = {
     "win":"0",
     "loss": "0",
+    "draw": "0",
     "slp": "0"
 }
 
@@ -169,11 +170,13 @@ def del_calc():
 def reset_winrate():
     canvas2.itemconfig(win_label, text = 0)
     canvas2.itemconfig(loss_label, text = 0)
+    canvas2.itemconfig(draw_label, text = 0)
 
 def tab2_save():
     global tab2_calculation
     tab2_data["win"] = canvas2.itemcget(win_label, 'text')
     tab2_data["loss"] = canvas2.itemcget(loss_label, 'text')
+    tab2_data["draw"] = canvas2.itemcget(draw_label, 'text')
     if tab2_calculation == "":
         tab2_data["slp"] = "0"
     else:
@@ -189,6 +192,7 @@ def tab2_load():
 
     canvas2.itemconfig(win_label, text = data["win"])
     canvas2.itemconfig(loss_label, text = data["loss"])
+    canvas2.itemconfig(draw_label, text = data["draw"])
     tab2_calculation = str(data["slp"])
     calc_text.delete(1.0, "end")
     calc_text.insert(1.0, tab2_calculation)
@@ -293,7 +297,7 @@ b8.place(x = 186, y = 150, width = 51, height = 53)
 energy_count = canvas1.create_text(149.0, 86.0,text = "3",  fill = clr_white, font = (dflt_fnt, int(48.0)))
 
 
-# Round count
+# Round countg
 round_count = canvas1.create_text( 90.5, 28.0, text = "1", fill = clr_white, font = (dflt_fnt, int(24.0)))
 
 ####################################################################################################
@@ -395,26 +399,37 @@ calc_plus = create_lambda_btn(tab2, add_to_calc, "+", btn_calc_plus_img)
 calc_plus.place(x = 196, y = 347, width = 39, height = 81)
 
 #winrate label
-win_label = canvas2.create_text(94.0, 88.0, text = "0", fill = "#ffffff", font = (dflt_fnt, int(40.0)))
+win_label = canvas2.create_text(64.0, 97.0, text = "0", fill = "#ffffff", font = (dflt_fnt, int(40.0)))
 
 #loss label
-loss_label = canvas2.create_text(206.0, 88.0, text = "0", fill = "#ffffff", font = (dflt_fnt, int(40.0)))
+loss_label = canvas2.create_text(151.0, 97.0, text = "0", fill = "#ffffff", font = (dflt_fnt, int(40.0)))
 
-# small - ng nde ko pa alam
+#draw label
+draw_label = canvas2.create_text(236.0, 97.0, text = "0", fill = "#ffffff", font = (dflt_fnt, int(40.0)))
+
+# small - ng Loss
 loss_minus = create_lambda_btn(tab2, btn_minus, loss_label, btn_small_minus_img, canvas2)
-loss_minus.place(x = 174, y = 123, width = 29, height = 30)
+loss_minus.place(x = 119, y = 136, width = 29, height = 30)
 
-# small + ng nde ko pa alam
+# small + Loss
 loss_plus = create_lambda_btn(tab2, btn_add, loss_label, btn_small_plus_img, canvas2)
-loss_plus.place(x = 212, y = 123, width = 30, height = 30)
+loss_plus.place(x = 157, y = 136, width = 30, height = 30)
 
-#small - nde ko alam
+#small - WIN
 win_minus = create_lambda_btn(tab2, btn_minus, win_label, btn_small_minus_img, canvas2)
-win_minus.place(x = 61, y = 123, width = 29, height = 30)
+win_minus.place(x = 33, y = 134, width = 29, height = 30)
 
-# small + ng nde ko know hahahahha
+# small + WIN
 win_plus = create_lambda_btn(tab2, btn_add, win_label, btn_small_plus_img, canvas2)
-win_plus.place(x = 99, y = 123, width = 29, height = 30)
+win_plus.place(x = 71, y = 134, width = 29, height = 30)
+
+#small - DRAW
+draw_minus = create_lambda_btn(tab2, btn_minus, draw_label, btn_small_minus_img, canvas2)
+draw_minus.place(x = 205, y = 136, width = 29, height = 30)
+
+# small + DRAW
+draw_plus = create_lambda_btn(tab2, btn_add, draw_label, btn_small_plus_img, canvas2)
+draw_plus.place(x = 243, y = 136, width = 29, height = 30)
 
 #save button
 b19 = create_norm_btn(tab2, tab2_save, btn_save_img)
@@ -422,11 +437,11 @@ b19.place(x = 254, y = 407, width = 35, height = 36)
 
 #small reset
 b20 = create_norm_btn(tab2, reset_winrate, btn_small_reset_img)
-b20.place(x = 137, y = 71, width = 30, height = 30)
+b20.place(x = 6, y = 6, width = 35, height = 35)
 
 #text Box
-tab2_textbox_img = PhotoImage(master=tab2, file = f"./images/tab2_textbox.png")
-entry0_bg = canvas2.create_image(127.0, 217.0,image = tab2_textbox_img)
+# tab2_textbox_img = PhotoImage(master=tab2, file = f"./images/tab2_textbox.png")
+# entry0_bg = canvas2.create_image(128.5, 226.0, image = tab2_textbox_img)
 calc_text = Text(
     tab2,
     # height=36,
@@ -438,37 +453,34 @@ calc_text = Text(
     highlightthickness = 0,
     font = (dflt_fnt, int(25.0)))
 calc_text.place(
-    x = 45, y = 198,
+    x = 45, y = 203,
     width = 167,
     height = 36)
 ####################################################################################################
 
-window.bind("<w>", on_press)
-window.bind("<q>", on_press)
-window.bind("<s>", on_press)
-window.bind("<a>", on_press)
-window.bind("<x>", on_press)
-window.bind("<z>", on_press)
-window.bind("<f>", on_press)
-window.bind("<r>", on_press)
-window.bind("<e>", on_press)
+# # Hotkeys not working when exported as exe
+# window.bind("<w>", on_press)
+# window.bind("<q>", on_press)
+# window.bind("<s>", on_press)
+# window.bind("<a>", on_press)
+# window.bind("<x>", on_press)
+# window.bind("<z>", on_press)
+# window.bind("<f>", on_press)
+# window.bind("<r>", on_press)
+# window.bind("<e>", on_press)
 
-window.bind("<W>", on_press)
-window.bind("<Q>", on_press)
-window.bind("<S>", on_press)
-window.bind("<A>", on_press)
-window.bind("<X>", on_press)
-window.bind("<Z>", on_press)
-window.bind("<F>", on_press)
-window.bind("<R>", on_press)
-window.bind("<E>", on_press)
+# window.bind("<W>", on_press)
+# window.bind("<Q>", on_press)
+# window.bind("<S>", on_press)
+# window.bind("<A>", on_press)
+# window.bind("<X>", on_press)
+# window.bind("<Z>", on_press)
+# window.bind("<F>", on_press)
+# window.bind("<R>", on_press)
+# window.bind("<E>", on_press)
 
 
-def doSomething():
-    window.quit()
-window.protocol('WM_DELETE_WINDOW', doSomething)
 tab2_load()
-print("Hello World")
 window.resizable(False, False)
 window.mainloop()
 sys.exit()
