@@ -19,18 +19,37 @@ def end_round():
     destroyed = int(canvas1.itemcget(e_destroyed_num, 'text'))
     energy = int(canvas1.itemcget(energy_count, 'text'))
     round = int(canvas1.itemcget(round_count, 'text'))
+    card = int(canvas1.itemcget(card_count, 'text'))
+
+    used_destroyed = int(canvas1.itemcget(used_destroyed_cards, 'text'))
+    draw = int(canvas1.itemcget(draw_cards, 'text'))
+    prev_cards = int(canvas1.itemcget(prev_round_cards, 'text'))
+
+    #saving for accidental endturn
+    prev_round["pre_used_destroyed"] = prev_round["used_destroyed"]
+    prev_round["pre_draw_cards"] = prev_round["draw_cards"]
 
     #saving current round state
     prev_round["round"] = str(round)
     prev_round["energy"] = str(energy)
+    prev_round["card"] = str(card)
+    prev_round["used_destroyed"] = str(used_destroyed)
+    prev_round["draw_cards"] = str(draw)
+    prev_round["prev_cards"] = str(prev_cards)
 
     energy = numpy.clip((energy - used + gained - destroyed), 0, 8) + 2
+    card = numpy.clip((card - used_destroyed + draw), 0, 9) + 3
 
     canvas1.itemconfig(round_count, text = str(round+1))
     canvas1.itemconfig(energy_count, text = str(energy))
+    canvas1.itemconfig(card_count, text = str(card))
     canvas1.itemconfig(e_used_num, text = 0)
     canvas1.itemconfig(e_gained_num, text = 0)
     canvas1.itemconfig(e_destroyed_num, text = 0)
+
+    canvas1.itemconfig(used_destroyed_cards, text = 0)
+    canvas1.itemconfig(draw_cards, text = 0)
+    canvas1.itemconfig(prev_round_cards, text = 0)
     print("End Round")
 
 # Reset fuction
@@ -41,44 +60,97 @@ def reset_app():
     canvas1.itemconfig(e_gained_num, text = 0)
     canvas1.itemconfig(e_destroyed_num, text = 0)
 
+    canvas1.itemconfig(used_destroyed_cards, text = 0)
+    canvas1.itemconfig(draw_cards, text = 0)
+    canvas1.itemconfig(prev_round_cards, text = 0)
+    canvas1.itemconfig(card_count, text = 6)
+
     prev_round["round"] = "1"
     prev_round["energy"] = "3"
-    print("Reset")
+    prev_round["card"] = "6"
+    print("reset")
+    window.attributes('-alpha', .6)
 
 
 # Return to the previous round state
 def undo_round():
+    window.attributes('-alpha', 1)
     if canvas1.itemcget(round_count, 'text') != prev_round["round"]:
         canvas1.itemconfig(round_count, text = prev_round["round"])
         canvas1.itemconfig(energy_count, text = prev_round["energy"])
+        canvas1.itemconfig(card_count, text = prev_round["card"])
+
+        prev_round["used_destroyed"] = prev_round["pre_used_destroyed"]
+        prev_round["draw_cards"] = prev_round["pre_draw_cards"]
 
         canvas1.itemconfig(e_used_num, text = 0)
         canvas1.itemconfig(e_gained_num, text = 0)
         canvas1.itemconfig(e_destroyed_num, text = 0)
+
+        canvas1.itemconfig(used_destroyed_cards, text = 0)
+        canvas1.itemconfig(draw_cards, text = 0)
+        canvas1.itemconfig(prev_round_cards, text = 0)
         print("Undo")
+
+    
+def prev_card_plus(operation):
+    prev_cards = 0
+    if operation == "plus":
+        prev_cards = numpy.clip((int(canvas1.itemcget(prev_round_cards, 'text'))+1), 0, 12)
+    elif operation == "minus":
+        prev_cards = numpy.clip((int(canvas1.itemcget(prev_round_cards, 'text'))-1), 0, 12)
+    
+    canvas1.itemconfig(prev_round_cards, text = str(prev_cards))
+    print("Prev USED: " + prev_round["used_destroyed"])
+    print("Prev DRAW: " + prev_round["draw_cards"])
+    total = numpy.clip((prev_cards - int(prev_round["used_destroyed"]) + int(prev_round["draw_cards"])), 0, 9) + 3
+    if prev_cards == 0:
+        canvas1.itemconfig(card_count, text = prev_round["card"])
+    else:
+        canvas1.itemconfig(card_count, text = str(total))
 
 
 # Dictionary of the prev round
 prev_round = {
     "round":"1",
     "energy": "3",
+    "card": "6",
+    "prev_cards": "0",
+    "draw_cards": "0",
+    "used_destroyed": "0",
+    "pre_draw_cards": "0",
+    "pre_used_destroyed": "0"
 }
 
 
 def btn_add(id,canvas):
+    global canvas1
     num = str(numpy.clip(int(canvas.itemcget(id, 'text'))+1, 0, 50)) #getter ng item
     canvas.itemconfig(id, text = num) #setter function
+    if canvas == canvas1:
+        if id == 4:
+            used_destroyed = numpy.clip(int(canvas1.itemcget(used_destroyed_cards, 'text'))+1, 0, 50)
+            canvas1.itemconfig(used_destroyed_cards, text = str(used_destroyed))
+    elif canvas == canvas2:
+        tab2_save()
 
 
 def btn_minus(id,canvas):
     num = str(numpy.clip(int(canvas.itemcget(id, 'text'))-1, 0, 50)) #getter ng item
     canvas.itemconfig(id, text = num) #setter function
+    if canvas == canvas1:
+        if id == 4:
+            used_destroyed = numpy.clip(int(canvas1.itemcget(used_destroyed_cards, 'text'))-1, 0, 50)
+            canvas1.itemconfig(used_destroyed_cards, text = str(used_destroyed))
+    elif canvas == canvas2:
+        tab2_save()
 
 
 def create_norm_btn(root, func, img):
     return Button(
         root,
         image = img,
+        text = "~",
         borderwidth = 0,
         highlightthickness = 0,
         command = func,
@@ -150,11 +222,13 @@ def eval_calc():
     except:
         clear_calc()
         calc_text.insert(1.0, "Error")
+    tab2_save()
 
 def clear_calc():
     global tab2_calculation
     tab2_calculation = ""
     calc_text.delete(1.0, "end")
+    tab2_save()
 
 def del_calc():
     global tab2_calculation
@@ -166,11 +240,13 @@ def del_calc():
         # Str = Str.rstrip(Str[-1])
         calc_text.delete(1.0, "end")
         calc_text.insert(1.0, tab2_calculation)
+    tab2_save()
 
 def reset_winrate():
     canvas2.itemconfig(win_label, text = 0)
     canvas2.itemconfig(loss_label, text = 0)
     canvas2.itemconfig(draw_label, text = 0)
+    tab2_save()
 
 def tab2_save():
     global tab2_calculation
@@ -197,6 +273,36 @@ def tab2_load():
     calc_text.delete(1.0, "end")
     calc_text.insert(1.0, tab2_calculation)
 
+######################## Tab3 Function ################
+tab3_data = {
+    "opacity":0.6
+}
+
+def opacity_change(operation):
+    if operation == "plus":
+        tab3_data["opacity"] = round(float(numpy.clip(tab3_data["opacity"] + 0.05, 0.1, 1.0)),2)
+    elif operation == "minus":
+        tab3_data["opacity"] = round(float(numpy.clip(tab3_data["opacity"] - 0.05, 0.1, 1.0)),2)
+    canvas3.itemconfig(opacity_num, text = str(tab3_data["opacity"]))
+    window.attributes('-alpha', tab3_data["opacity"])
+    # print(tab3_data["opacity"])
+    save_opacity()
+
+
+def save_opacity():
+    with open('./saves/tab3.json', 'w') as fjson:
+        json.dump(tab3_data, fjson)
+
+
+def load_opacity():
+    data = {}
+    with open('./saves/tab3.json', 'r') as fjson:
+        data = json.load(fjson)
+
+    canvas3.itemconfig(opacity_num, text = str(data["opacity"]))
+    tab3_data["opacity"] = data["opacity"]
+    window.attributes('-alpha', float(data["opacity"]))
+########################################################################
 
 pyglet.font.add_file('./fonts/AldotheApache.ttf')
 dflt_fnt = "Aldo the Apache"
@@ -216,9 +322,11 @@ window.attributes('-topmost', 1)
 
 tab1 = Frame(nb, width=300, height=450)
 tab2 = Frame(nb, width=300, height=450)
+tab3 = Frame(nb, width=300, height=450)
 
 nb.add(tab1, text="ENERGY")
 nb.add(tab2, text="WINRATE")
+nb.add(tab3, text="SETTINGS")
 nb.pack()
 
 
@@ -258,47 +366,83 @@ b2.place(x = 236, y = 389, width = 51, height = 53)
 # Loading Plus and Minus buttons for tab1
 btn_minus_img = PhotoImage(master=tab1, file = f"./images/btn_minus.png")
 btn_plus_img = PhotoImage(master=tab1, file = f"./images/btn_plus.png")
+btn_smll_minus_img = PhotoImage(master=tab1, file = f"./images/btn_small_minus.png")
+btn_smll_plus_img = PhotoImage(master=tab1, file = f"./images/btn_small_plus.png")
 
 
 # Energy Destroyed Field
-e_destroyed_num = canvas1.create_text(150.5, 342.5, text = "0", fill = clr_white, font = (dflt_fnt, int(30.0)))
-canvas1.create_text(151.0, 302.5, text = "ENERGY DESTROYED", fill = clr_black, font = (dflt_fnt, int(16.0)))
+e_destroyed_num = canvas1.create_text(150.5, 360.5, text = "0", fill = clr_white, font = (dflt_fnt, int(30.0)))
 # Minus Energy Destroyed 
 b3 = create_lambda_btn(tab1, btn_minus, e_destroyed_num, btn_minus_img, canvas1)
-b3.place(x = 66, y = 316, width = 51, height = 53)
+b3.place(x = 66, y = 334, width = 51, height = 53)
 # Energy Destroyed PLUS
 b4 = create_lambda_btn(tab1, btn_add, e_destroyed_num, btn_plus_img, canvas1)
-b4.place(x = 188, y = 318, width = 51, height = 53)
+b4.place(x = 188, y = 334, width = 51, height = 53)
 
 
 # Energy Gained Number
-canvas1.create_text(151.0, 219.5, text = "ENERGY GAINED", fill = clr_black, font = (dflt_fnt, int(16.0)))
-e_gained_num = canvas1.create_text(150.0, 259.5, text = "0", fill = clr_white, font = (dflt_fnt, int(30.0)))
+e_gained_num = canvas1.create_text(150.0, 277.5, text = "0", fill = clr_white, font = (dflt_fnt, int(30.0)))
 # Energy Gained MINUS
 b5 = create_lambda_btn(tab1, btn_minus, e_gained_num, btn_minus_img, canvas1)
-b5.place(x = 66, y = 233, width = 51, height = 53)
+b5.place(x = 66, y = 251, width = 51, height = 53)
 # Energy Gained PLUS
 b6 = create_lambda_btn(tab1, btn_add, e_gained_num, btn_plus_img, canvas1)
-b6.place(x = 188, y = 232, width = 51, height = 53)
+b6.place(x = 188, y = 250, width = 51, height = 53)
 
 
 # Energy Used Field 
-canvas1.create_text(150.0, 136.5, text = "ENERGY USED", fill = clr_black, font = (dflt_fnt, int(16.0)))
-e_used_num = canvas1.create_text(149.5, 176.5, text = "0", fill = clr_white, font = (dflt_fnt, int(30.0)))
+e_used_num = canvas1.create_text(149.5, 193.5, text = "0", fill = clr_white, font = (dflt_fnt, int(30.0)))
 # USED MINUS
 b7 = create_lambda_btn(tab1, btn_minus, e_used_num, btn_minus_img, canvas1)
-b7.place(x = 65, y = 150, width = 51, height = 53)
+b7.place(x = 65, y = 168, width = 51, height = 53)
+print(e_used_num)
 # USED PLUS
 b8 = create_lambda_btn(tab1, btn_add, e_used_num, btn_plus_img, canvas1)
-b8.place(x = 186, y = 150, width = 51, height = 53)
+b8.place(x = 186, y = 168, width = 51, height = 53)
 
 
 # Energy count
-energy_count = canvas1.create_text(149.0, 86.0,text = "3",  fill = clr_white, font = (dflt_fnt, int(48.0)))
+energy_count = canvas1.create_text(149.0, 109.5,text = "3",  fill = clr_white, font = (dflt_fnt, int(48.0)))
 
 
 # Round countg
-round_count = canvas1.create_text( 90.5, 28.0, text = "1", fill = clr_white, font = (dflt_fnt, int(24.0)))
+round_count = canvas1.create_text( 78.5, 34.5, text = "1", fill = clr_white, font = (dflt_fnt, int(20.0)))
+
+
+# Card count
+card_count = canvas1.create_text(149.0, 38.5, text = "6", fill = "#ffffff", font = (dflt_fnt, int(28.0)))
+
+
+#Used Destroyed cards
+used_destroyed_cards = canvas1.create_text(247.5, 106, text = "0", fill = "#ffffff", font = (dflt_fnt, int(18.0)))
+#Used destroyed PLUS
+b9 = create_lambda_btn(tab1, btn_add, used_destroyed_cards, btn_smll_plus_img, canvas1)
+b9.place(x = 265, y = 91, width = 30, height = 30)
+#MINUS
+b10 = create_lambda_btn(tab1, btn_minus, used_destroyed_cards, btn_smll_minus_img, canvas1)
+b10.place(x = 204, y = 91, width = 29, height = 30)
+
+
+#draw cards
+draw_cards = canvas1.create_text(247.5, 52, text = "0", fill = "#ffffff", font = (dflt_fnt, int(18.0)))
+#PLUS
+b11 = create_lambda_btn(tab1, btn_add, draw_cards, btn_smll_plus_img, canvas1)
+b11.place(x = 265, y = 37, width = 30, height = 30)
+#MINUS
+b12 = create_lambda_btn(tab1, btn_minus, draw_cards, btn_smll_minus_img, canvas1)
+b12.place(x = 204, y = 37, width = 29, height = 30)
+
+
+#Prev round cards
+prev_round_cards = canvas1.create_text(49.0, 106, text = "0", fill = "#ffffff", font = (dflt_fnt, int(18.0)))
+#Prev round PLUS
+b13 = create_lambda_btn(tab1, prev_card_plus, "plus", btn_smll_plus_img)
+# prev_card_calc(tab1, btn_add, prev_round_cards, btn_smll_plus_img, "plus", canvas1)
+b13.place(x = 66, y = 91, width = 30, height = 30)
+#MINUS
+b14 = create_lambda_btn(tab1, prev_card_plus, "minus", btn_smll_minus_img)
+#prev_card_calc(tab1, btn_minus, prev_round_cards, btn_smll_minus_img, "minus", canvas1)
+b14.place(x = 5, y = 91, width = 29, height = 30)
 
 ####################################################################################################
 ##################### Tab2 #########################################################################
@@ -431,22 +575,17 @@ draw_minus.place(x = 205, y = 136, width = 29, height = 30)
 draw_plus = create_lambda_btn(tab2, btn_add, draw_label, btn_small_plus_img, canvas2)
 draw_plus.place(x = 243, y = 136, width = 29, height = 30)
 
-#save button
-b19 = create_norm_btn(tab2, tab2_save, btn_save_img)
-b19.place(x = 254, y = 407, width = 35, height = 36)
+# #save button
+# b19 = create_norm_btn(tab2, tab2_save, btn_save_img)
+# b19.place(x = 254, y = 407, width = 35, height = 36)
 
 #small reset
 b20 = create_norm_btn(tab2, reset_winrate, btn_small_reset_img)
-b20.place(x = 6, y = 6, width = 35, height = 35)
+b20.place(x = 135.83, y = 5, width = 35, height = 35)
 
-#text Box
-# tab2_textbox_img = PhotoImage(master=tab2, file = f"./images/tab2_textbox.png")
-# entry0_bg = canvas2.create_image(128.5, 226.0, image = tab2_textbox_img)
+#Calc text Box
 calc_text = Text(
     tab2,
-    # height=36,
-    # width=90,
-    # insertwidth=0,
     bd = 0,
     bg = "#d0b285",
     # yscrollcommand=S.set,
@@ -457,30 +596,43 @@ calc_text.place(
     width = 167,
     height = 36)
 ####################################################################################################
+##################### Tab3 #########################################################################
+canvas3 = Canvas(
+    tab3,
+    bg = "#ffffff",
+    height = 500,
+    width = 300,
+    bd = 0,
+    highlightthickness = 0,
+    relief = "ridge")
+canvas3.place(x = 0, y = 0)
 
-# # Hotkeys not working when exported as exe
-# window.bind("<w>", on_press)
-# window.bind("<q>", on_press)
-# window.bind("<s>", on_press)
-# window.bind("<a>", on_press)
-# window.bind("<x>", on_press)
-# window.bind("<z>", on_press)
-# window.bind("<f>", on_press)
-# window.bind("<r>", on_press)
-# window.bind("<e>", on_press)
+background_tab3 = PhotoImage(master=tab3, file = f"./images/background_tab3.png")
+background = canvas3.create_image(150.0, 95.0, image=background_tab3)
 
-# window.bind("<W>", on_press)
-# window.bind("<Q>", on_press)
-# window.bind("<S>", on_press)
-# window.bind("<A>", on_press)
-# window.bind("<X>", on_press)
-# window.bind("<Z>", on_press)
-# window.bind("<F>", on_press)
-# window.bind("<R>", on_press)
-# window.bind("<E>", on_press)
+opacity_num = canvas3.create_text(149.5, 108.0, text = "0.6", fill = "#ffffff", font = (dflt_fnt, int(25.0)))
 
+
+btn_opacity_minus = create_lambda_btn(tab3, opacity_change, "minus", btn_minus_img)
+btn_opacity_minus.place(
+    x = 60, y = 85,
+    width = 53,
+    height = 53)
+
+
+btn_opacity_plus = create_lambda_btn(tab3, opacity_change, "plus", btn_plus_img)
+btn_opacity_plus.place(
+    x = 192, y = 85,
+    width = 53,
+    height = 53)
+
+def doSomething():
+    window.quit()
+window.protocol('WM_DELETE_WINDOW', doSomething)
 
 tab2_load()
+load_opacity()
+
 window.resizable(False, False)
 window.mainloop()
 sys.exit()
