@@ -150,11 +150,13 @@ def eval_calc():
     except:
         clear_calc()
         calc_text.insert(1.0, "Error")
+    tab2_save()
 
 def clear_calc():
     global tab2_calculation
     tab2_calculation = ""
     calc_text.delete(1.0, "end")
+    tab2_save()
 
 def del_calc():
     global tab2_calculation
@@ -166,11 +168,13 @@ def del_calc():
         # Str = Str.rstrip(Str[-1])
         calc_text.delete(1.0, "end")
         calc_text.insert(1.0, tab2_calculation)
+    tab2_save()
 
 def reset_winrate():
     canvas2.itemconfig(win_label, text = 0)
     canvas2.itemconfig(loss_label, text = 0)
     canvas2.itemconfig(draw_label, text = 0)
+    tab2_save()
 
 def tab2_save():
     global tab2_calculation
@@ -197,6 +201,36 @@ def tab2_load():
     calc_text.delete(1.0, "end")
     calc_text.insert(1.0, tab2_calculation)
 
+######################## Tab3 Function ################
+tab3_data = {
+    "opacity":0.6
+}
+
+def opacity_change(operation):
+    if operation == "plus":
+        tab3_data["opacity"] = round(float(numpy.clip(tab3_data["opacity"] + 0.05, 0.1, 1.0)),2)
+    elif operation == "minus":
+        tab3_data["opacity"] = round(float(numpy.clip(tab3_data["opacity"] - 0.05, 0.1, 1.0)),2)
+    canvas3.itemconfig(opacity_num, text = str(tab3_data["opacity"]))
+    window.attributes('-alpha', tab3_data["opacity"])
+    # print(tab3_data["opacity"])
+    save_opacity()
+
+
+def save_opacity():
+    with open('./saves/tab3.json', 'w') as fjson:
+        json.dump(tab3_data, fjson)
+
+
+def load_opacity():
+    data = {}
+    with open('./saves/tab3.json', 'r') as fjson:
+        data = json.load(fjson)
+
+    canvas3.itemconfig(opacity_num, text = str(data["opacity"]))
+    tab3_data["opacity"] = data["opacity"]
+    window.attributes('-alpha', float(data["opacity"]))
+########################################################################
 
 pyglet.font.add_file('./fonts/AldotheApache.ttf')
 dflt_fnt = "Aldo the Apache"
@@ -216,9 +250,11 @@ window.attributes('-topmost', 1)
 
 tab1 = Frame(nb, width=300, height=450)
 tab2 = Frame(nb, width=300, height=450)
+tab3 = Frame(nb, width=300, height=450)
 
 nb.add(tab1, text="ENERGY")
 nb.add(tab2, text="WINRATE")
+nb.add(tab3, text="SETTINGS")
 nb.pack()
 
 
@@ -431,22 +467,17 @@ draw_minus.place(x = 205, y = 136, width = 29, height = 30)
 draw_plus = create_lambda_btn(tab2, btn_add, draw_label, btn_small_plus_img, canvas2)
 draw_plus.place(x = 243, y = 136, width = 29, height = 30)
 
-#save button
-b19 = create_norm_btn(tab2, tab2_save, btn_save_img)
-b19.place(x = 254, y = 407, width = 35, height = 36)
+# #save button
+# b19 = create_norm_btn(tab2, tab2_save, btn_save_img)
+# b19.place(x = 254, y = 407, width = 35, height = 36)
 
 #small reset
 b20 = create_norm_btn(tab2, reset_winrate, btn_small_reset_img)
-b20.place(x = 6, y = 6, width = 35, height = 35)
+b20.place(x = 135.83, y = 5, width = 35, height = 35)
 
-#text Box
-# tab2_textbox_img = PhotoImage(master=tab2, file = f"./images/tab2_textbox.png")
-# entry0_bg = canvas2.create_image(128.5, 226.0, image = tab2_textbox_img)
+#Calc text Box
 calc_text = Text(
     tab2,
-    # height=36,
-    # width=90,
-    # insertwidth=0,
     bd = 0,
     bg = "#d0b285",
     # yscrollcommand=S.set,
@@ -457,30 +488,42 @@ calc_text.place(
     width = 167,
     height = 36)
 ####################################################################################################
+##################### Tab3 #########################################################################
+canvas3 = Canvas(
+    tab3,
+    bg = "#ffffff",
+    height = 500,
+    width = 300,
+    bd = 0,
+    highlightthickness = 0,
+    relief = "ridge")
+canvas3.place(x = 0, y = 0)
 
-# # Hotkeys not working when exported as exe
-# window.bind("<w>", on_press)
-# window.bind("<q>", on_press)
-# window.bind("<s>", on_press)
-# window.bind("<a>", on_press)
-# window.bind("<x>", on_press)
-# window.bind("<z>", on_press)
-# window.bind("<f>", on_press)
-# window.bind("<r>", on_press)
-# window.bind("<e>", on_press)
+background_tab3 = PhotoImage(master=tab3, file = f"./images/background_tab3.png")
+background = canvas3.create_image(150.0, 95.0, image=background_tab3)
 
-# window.bind("<W>", on_press)
-# window.bind("<Q>", on_press)
-# window.bind("<S>", on_press)
-# window.bind("<A>", on_press)
-# window.bind("<X>", on_press)
-# window.bind("<Z>", on_press)
-# window.bind("<F>", on_press)
-# window.bind("<R>", on_press)
-# window.bind("<E>", on_press)
+opacity_num = canvas3.create_text(149.5, 108.0, text = "0.6", fill = "#ffffff", font = (dflt_fnt, int(25.0)))
 
+
+btn_opacity_minus = create_lambda_btn(tab3, opacity_change, "minus", btn_minus_img)
+btn_opacity_minus.place(
+    x = 60, y = 85,
+    width = 53,
+    height = 53)
+
+
+btn_opacity_plus = create_lambda_btn(tab3, opacity_change, "plus", btn_plus_img)
+btn_opacity_plus.place(
+    x = 192, y = 85,
+    width = 53,
+    height = 53)
+
+def doSomething():
+    window.quit()
+window.protocol('WM_DELETE_WINDOW', doSomething)
 
 tab2_load()
+load_opacity()
 window.resizable(False, False)
 window.mainloop()
 sys.exit()
