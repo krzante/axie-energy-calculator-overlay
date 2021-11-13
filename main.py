@@ -283,7 +283,7 @@ def opacity_change(operation):
         tab3_data["opacity"] = round(float(numpy.clip(tab3_data["opacity"] + 0.05, 0.1, 1.0)),2)
     elif operation == "minus":
         tab3_data["opacity"] = round(float(numpy.clip(tab3_data["opacity"] - 0.05, 0.1, 1.0)),2)
-    canvas3.itemconfig(opacity_num, text = str(tab3_data["opacity"]))
+    canvas3.itemconfig(opacity_num, text = str(int(round(float(tab3_data["opacity"])*100))))#canvas3.itemconfig(opacity_num, text = str(tab3_data["opacity"]))
     window.attributes('-alpha', tab3_data["opacity"])
     # print(tab3_data["opacity"])
     save_opacity()
@@ -299,7 +299,7 @@ def load_opacity():
     with open('./saves/tab3.json', 'r') as fjson:
         data = json.load(fjson)
 
-    canvas3.itemconfig(opacity_num, text = str(data["opacity"]))
+    canvas3.itemconfig(opacity_num, text = str(int(round(float(data["opacity"])*100))))
     tab3_data["opacity"] = data["opacity"]
     window.attributes('-alpha', float(data["opacity"]))
 ########################################################################
@@ -316,7 +316,7 @@ window.iconbitmap("./images/icon.ico")
 
 window.geometry("300x475")
 # window.configure(bg = "red")
-window.title("zakyr's Axie Calculator")
+window.title("zakyr's Energy Calculator")
 window.attributes('-alpha', 0.6)
 window.attributes('-topmost', 1)
 
@@ -543,37 +543,37 @@ calc_plus = create_lambda_btn(tab2, add_to_calc, "+", btn_calc_plus_img)
 calc_plus.place(x = 196, y = 347, width = 39, height = 81)
 
 #winrate label
-win_label = canvas2.create_text(64.0, 97.0, text = "0", fill = "#ffffff", font = (dflt_fnt, int(40.0)))
+win_label = canvas2.create_text(64.0, 105.0, text = "0", fill = "#ffffff", font = (dflt_fnt, int(40.0)))
 
 #loss label
-loss_label = canvas2.create_text(151.0, 97.0, text = "0", fill = "#ffffff", font = (dflt_fnt, int(40.0)))
+loss_label = canvas2.create_text(151.0, 105.0, text = "0", fill = "#ffffff", font = (dflt_fnt, int(40.0)))
 
 #draw label
-draw_label = canvas2.create_text(236.0, 97.0, text = "0", fill = "#ffffff", font = (dflt_fnt, int(40.0)))
+draw_label = canvas2.create_text(236.0, 105.0, text = "0", fill = "#ffffff", font = (dflt_fnt, int(40.0)))
 
 # small - ng Loss
 loss_minus = create_lambda_btn(tab2, btn_minus, loss_label, btn_small_minus_img, canvas2)
-loss_minus.place(x = 119, y = 136, width = 29, height = 30)
+loss_minus.place(x = 119, y = 142, width = 29, height = 30)
 
 # small + Loss
 loss_plus = create_lambda_btn(tab2, btn_add, loss_label, btn_small_plus_img, canvas2)
-loss_plus.place(x = 157, y = 136, width = 30, height = 30)
+loss_plus.place(x = 157, y = 142, width = 30, height = 30)
 
 #small - WIN
 win_minus = create_lambda_btn(tab2, btn_minus, win_label, btn_small_minus_img, canvas2)
-win_minus.place(x = 33, y = 134, width = 29, height = 30)
+win_minus.place(x = 33, y = 142, width = 29, height = 30)
 
 # small + WIN
 win_plus = create_lambda_btn(tab2, btn_add, win_label, btn_small_plus_img, canvas2)
-win_plus.place(x = 71, y = 134, width = 29, height = 30)
+win_plus.place(x = 71, y = 142, width = 29, height = 30)
 
 #small - DRAW
 draw_minus = create_lambda_btn(tab2, btn_minus, draw_label, btn_small_minus_img, canvas2)
-draw_minus.place(x = 205, y = 136, width = 29, height = 30)
+draw_minus.place(x = 205, y = 142, width = 29, height = 30)
 
 # small + DRAW
 draw_plus = create_lambda_btn(tab2, btn_add, draw_label, btn_small_plus_img, canvas2)
-draw_plus.place(x = 243, y = 136, width = 29, height = 30)
+draw_plus.place(x = 243, y = 142, width = 29, height = 30)
 
 # #save button
 # b19 = create_norm_btn(tab2, tab2_save, btn_save_img)
@@ -581,7 +581,7 @@ draw_plus.place(x = 243, y = 136, width = 29, height = 30)
 
 #small reset
 b20 = create_norm_btn(tab2, reset_winrate, btn_small_reset_img)
-b20.place(x = 135.83, y = 5, width = 35, height = 35)
+b20.place(x = 135.83, y = 7, width = 35, height = 35)
 
 #Calc text Box
 calc_text = Text(
