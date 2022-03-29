@@ -6,9 +6,5 @@ dist/
 build/
 output/
 
-<<<<<<< HEAD
-*.spec
-=======
 *.spec
 setup.py
->>>>>>> 2f062260664f91db687cfa9bfa9fbb258c372212
