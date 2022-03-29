@@ -11,8 +11,9 @@ pyglet = "*"
 pynput = "*"
 auto-py-to-exe = "*"
 asteval = "*"
+tk = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.10"
+python_version = "3.10.1"
