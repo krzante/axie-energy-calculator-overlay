@@ -200,93 +200,20 @@ tab2_draw_minus_button.place(x = 209, y = 130, width = 30, height = 33)
 tab2_draw_plus_button = CustomButton.lambda_button(tab2, tab2_plus_button_img, t2.add_to_counter, tab2_canvas, tab2_text_tags['draw'], tab2_text_tags)
 tab2_draw_plus_button.place(x = 243, y = 130, width = 30, height = 32)
 
-# Tab2 Calculator Screen
-tab2_text_tags["calc"] = Entry(
-    tab2,
-    bd = 0,
-    bg = "#d0b285",
-    highlightthickness = 0,
-    font = (default_font, int(25.0)))
+tab2_update_button_img = PhotoImage(master=tab2, file = f"./resources/images/buttons/update_button.png")
+tab2_update_button = CustomButton.normal_button(tab2, tab2_update_button_img, t2.update_data)
+# img1 = PhotoImage(file = f"img1.png")
+# b1 = Button(
+#     image = img1,
+#     borderwidth = 0,
+#     highlightthickness = 0,
+#     command = btn_clicked,
+#     relief = "flat")
 
-tab2_text_tags["calc"].place(
-    x = 49, y = 203,
-    width = 151,
-    height = 38)
-
-# Tab2 0 Button
-tab2_calc_0_img = PhotoImage(master=tab2, file = f"./resources/images/buttons/calc_button_0.png")
-tab2_calc_0 = CustomButton.lambda_button(tab2, tab2_calc_0_img, t2.add_to_calc, "0", tab2_text_tags['calc'])
-tab2_calc_0.place(x = 112, y = 403, width = 40, height = 42)
-
-# Tab2 1 Button
-tab2_calc_1_img = PhotoImage(master=tab2, file = f"./resources/images/buttons/calc_button_1.png")
-tab2_calc_1 = CustomButton.lambda_button(tab2, tab2_calc_1_img, t2.add_to_calc, "1", tab2_text_tags['calc'])
-tab2_calc_1.place(x = 69, y = 359, width = 40, height = 42)
-
-# Tab2 2 Button
-tab2_calc_2_img = PhotoImage(master=tab2, file = f"./resources/images/buttons/calc_button_2.png")
-tab2_calc_2 = CustomButton.lambda_button(tab2, tab2_calc_2_img, t2.add_to_calc, "2", tab2_text_tags['calc'])
-tab2_calc_2.place(x = 112, y = 359, width = 40, height = 42)
-
-# Tab2 3 Button
-tab2_calc_3_img = PhotoImage(master=tab2, file = f"./resources/images/buttons/calc_button_3.png")
-tab2_calc_3 = CustomButton.lambda_button(tab2, tab2_calc_3_img, t2.add_to_calc, "3", tab2_text_tags['calc'])
-tab2_calc_3.place(x = 155, y = 359, width = 40, height = 42)
-
-# Tab2 4 Button
-tab2_calc_4_img = PhotoImage(master=tab2, file = f"./resources/images/buttons/calc_button_4.png")
-tab2_calc_4 = CustomButton.lambda_button(tab2, tab2_calc_4_img, t2.add_to_calc, "4", tab2_text_tags['calc'])
-tab2_calc_4.place(x = 69, y = 315, width = 40, height = 42)
-
-# Tab2 5 Button
-tab2_calc_5_img = PhotoImage(master=tab2, file = f"./resources/images/buttons/calc_button_5.png")
-tab2_calc_5 = CustomButton.lambda_button(tab2, tab2_calc_5_img, t2.add_to_calc, "5", tab2_text_tags['calc'])
-tab2_calc_5.place(x = 112, y = 315, width = 40, height = 42)
-
-# Tab2 6 Button
-tab2_calc_6_img = PhotoImage(master=tab2, file = f"./resources/images/buttons/calc_button_6.png")
-tab2_calc_6 = CustomButton.lambda_button(tab2, tab2_calc_6_img, t2.add_to_calc, "6", tab2_text_tags['calc'])
-tab2_calc_6.place(x = 155, y = 315, width = 40, height = 42)
-
-# Tab2 7 Button
-tab2_calc_7_img = PhotoImage(master=tab2, file = f"./resources/images/buttons/calc_button_7.png")
-tab2_calc_7 = CustomButton.lambda_button(tab2, tab2_calc_7_img, t2.add_to_calc, "7", tab2_text_tags['calc'])
-tab2_calc_7.place(x = 69, y = 271, width = 40, height = 42)
-
-# Tab2 8 Button
-tab2_calc_8_img = PhotoImage(master=tab2, file = f"./resources/images/buttons/calc_button_8.png")
-tab2_calc_8 = CustomButton.lambda_button(tab2, tab2_calc_8_img, t2.add_to_calc, "8", tab2_text_tags['calc'])
-tab2_calc_8.place(x = 112, y = 271, width = 40, height = 42)
-
-# Tab2 9 Button
-tab2_calc_9_img = PhotoImage(master=tab2, file = f"./resources/images/buttons/calc_button_9.png")
-tab2_calc_9 = CustomButton.lambda_button(tab2, tab2_calc_9_img, t2.add_to_calc, "9", tab2_text_tags['calc'])
-tab2_calc_9.place(x = 155, y = 271, width = 40, height = 42)
-
-# Tab2 Plus Button
-tab2_calc_plus_img = PhotoImage(master=tab2, file = f"./resources/images/buttons/calc_button_plus.png")
-tab2_calc_plus = CustomButton.lambda_button(tab2, tab2_calc_plus_img, t2.add_to_calc, "+", tab2_text_tags['calc'])
-tab2_calc_plus.place(x = 198, y = 359, width = 40, height = 86)
-
-# Tab2 Minus Button
-tab2_calc_minus_img = PhotoImage(master=tab2, file = f"./resources/images/buttons/calc_button_minus.png")
-tab2_calc_minus = CustomButton.lambda_button(tab2, tab2_calc_minus_img, t2.add_to_calc, "-", tab2_text_tags['calc'])
-tab2_calc_minus.place(x = 198, y = 315, width = 40, height = 42)
-
-# Tab2 Clear Button
-tab2_calc_clear_img = PhotoImage(master=tab2, file = f"./resources/images/buttons/calc_button_clear.png")
-tab2_calc_clear = CustomButton.lambda_button(tab2, tab2_calc_clear_img, t2.clear_calc, tab2_text_tags['calc'])
-tab2_calc_clear.place(x = 69, y = 403, width = 40, height = 42)
-
-# Tab2 Delete Button
-tab2_calc_del_img = PhotoImage(master=tab2, file = f"./resources/images/buttons/calc_button_del.png")
-tab2_calc_del = CustomButton.lambda_button(tab2, tab2_calc_del_img, t2.del_calc, tab2_text_tags['calc'])
-tab2_calc_del.place(x = 198, y = 271, width = 40, height = 42)
-
-# Tab2 Equals Button
-tab2_calc_equals_img = PhotoImage(master=tab2, file = f"./resources/images/buttons/calc_button_equals.png")
-tab2_calc_equals = CustomButton.lambda_button(tab2, tab2_calc_equals_img, t2.eval_calc, tab2_canvas, tab2_text_tags)
-tab2_calc_equals.place(x = 155, y = 403, width = 40, height = 42)
+tab2_update_button.place(
+    x = 137, y = 404,
+    width = 33,
+    height = 36)
 
 #####################################################################################################
 ################################## TAB 3 ############################################################

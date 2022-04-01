@@ -1,6 +1,9 @@
 # Tab 2 Functions
 from tkinter import *
 from asteval import Interpreter
+from dotenv import load_dotenv
+load_dotenv()
+import requests
 import json
 
 aeval = Interpreter()
@@ -39,34 +42,35 @@ class Tab2:
         Tab2.tab2_save(canvas_arg, tab_tags_arg)
     
 
-    def add_to_calc(symbol, screen_arg):
-        screen_content = screen_arg.get()
-        if screen_content == "0" or screen_content == "None" or screen_content == "ERROR":
-            Tab2.clear_calc(screen_arg)
-        screen_arg.insert(END, symbol)
+    # def add_to_calc(symbol, screen_arg):
+    #     screen_content = screen_arg.get()
+    #     if screen_content == "0" or screen_content == "None" or screen_content == "ERROR":
+    #         Tab2.clear_calc(screen_arg)
+    #     screen_arg.insert(END, symbol)
     
 
-    def del_calc(screen_arg):
-        screen_content = screen_arg.get()
-        if screen_content != "":
-            # https://stackoverflow.com/questions/51733663/how-to-delete-single-character-from-entry-widget-tkinter/51733802
-            screen_arg.delete(len(screen_content)-1)
+    # def del_calc(screen_arg):
+    #     screen_content = screen_arg.get()
+    #     if screen_content != "":
+    #         # https://stackoverflow.com/questions/51733663/how-to-delete-single-character-from-entry-widget-tkinter/51733802
+    #         screen_arg.delete(len(screen_content)-1)
     
 
-    def clear_calc(screen_arg):
-        screen_arg.delete(0, END)
+    # def clear_calc(screen_arg):
+    #     pass
+    #     # screen_arg.delete(0, END)
     
 
-    def eval_calc(canvas_arg, tab_tags_arg):
-        screen_content = tab_tags_arg['calc'].get()
-        try:
-            tab2_calculation = str(aeval(screen_content))
-            Tab2.clear_calc(tab_tags_arg['calc'])
-            tab_tags_arg['calc'].insert(INSERT, tab2_calculation)
-        except:
-            Tab2.clear_calc(tab_tags_arg['calc'])
-            tab_tags_arg['calc'].insert(INSERT, "ERROR")
-        Tab2.tab2_save(canvas_arg, tab_tags_arg)
+    # def eval_calc(canvas_arg, tab_tags_arg):
+    #     screen_content = tab_tags_arg['calc'].get()
+    #     try:
+    #         tab2_calculation = str(aeval(screen_content))
+    #         Tab2.clear_calc(tab_tags_arg['calc'])
+    #         tab_tags_arg['calc'].insert(INSERT, tab2_calculation)
+    #     except:
+    #         Tab2.clear_calc(tab_tags_arg['calc'])
+    #         tab_tags_arg['calc'].insert(INSERT, "ERROR")
+    #     Tab2.tab2_save(canvas_arg, tab_tags_arg)
     
     
     def tab2_save(canvas_arg, tab_tags_arg):
@@ -90,5 +94,19 @@ class Tab2:
         canvas_arg.itemconfig(tab_tags_args['win'], text = data["win"])
         canvas_arg.itemconfig(tab_tags_args['loss'], text = data["loss"])
         canvas_arg.itemconfig(tab_tags_args['draw'], text = data["draw"])
-        Tab2.clear_calc(tab_tags_args['calc'])
-        tab_tags_args['calc'].insert(INSERT, str(data['slp']))
+        # Tab2.clear_calc(tab_tags_args['calc'])
+        # tab_tags_args['calc'].insert(INSERT, str(data['slp']))
+    
+
+    def update_data():
+        url = "https://axie-infinity.p.rapidapi.com/get-update/"
+        querystring = {"id":""}
+
+        headers = {
+            "X-RapidAPI-Host": "axie-infinity.p.rapidapi.com",
+            "X-RapidAPI-Key": ""
+        }
+
+        response = requests.request("GET", url, headers=headers, params=querystring)
+        print(response.text)
+        print(type(response.text))

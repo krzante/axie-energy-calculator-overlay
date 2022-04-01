@@ -11,6 +11,8 @@ pyglet = "*"
 pynput = "*"
 asteval = "*"
 tk = "*"
+requests = "*"
+python-dotenv = "*"
 
 [dev-packages]
 
