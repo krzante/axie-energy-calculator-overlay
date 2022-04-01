@@ -1,9 +1,10 @@
 # Tab 2 Functions
+import os
 from tkinter import *
 from asteval import Interpreter
 from dotenv import load_dotenv
 load_dotenv()
-import requests
+import http.client
 import json
 
 aeval = Interpreter()
@@ -13,7 +14,12 @@ tab2_data = {
     "win":"0",
     "loss": "0",
     "draw": "0",
-    "slp": "0"
+    "slp": "0",
+    "wallet": "",
+    "total_slp": "0",
+    "average_slp": "0",
+    "today_slp": "0",
+    "yesterday_slp": "0",
 }
 
 class Tab2:
@@ -96,17 +102,29 @@ class Tab2:
         canvas_arg.itemconfig(tab_tags_args['draw'], text = data["draw"])
         # Tab2.clear_calc(tab_tags_args['calc'])
         # tab_tags_args['calc'].insert(INSERT, str(data['slp']))
+
+        # Getting the user's ronin address
+        with open('./resources/wallet.json', 'r') as fjson:
+            data = json.load(fjson)
+
+        tab2_data['wallet'] = data['wallet']
+        
     
 
     def update_data():
-        url = "https://axie-infinity.p.rapidapi.com/get-update/"
-        querystring = {"id":""}
+        conn = http.client.HTTPSConnection("axie-infinity.p.rapidapi.com")
 
         headers = {
-            "X-RapidAPI-Host": "axie-infinity.p.rapidapi.com",
-            "X-RapidAPI-Key": ""
-        }
+            'X-RapidAPI-Host': "axie-infinity.p.rapidapi.com",
+            'X-RapidAPI-Key': str(os.getenv("RAPIDAPI_KEY"))
+            }
 
-        response = requests.request("GET", url, headers=headers, params=querystring)
-        print(response.text)
-        print(type(response.text))
+        conn.request("GET", "/get-update/{}?id={}".format(str(tab2_data['wallet']), str(tab2_data['wallet'])), headers=headers)
+
+        res = conn.getresponse()
+        data = res.read()
+
+        dataset = json.loads(data.decode("utf-8"))
+        # print(dataset)
+        # print(type(dataset))
+        # print(dataset['slp']['total'])
