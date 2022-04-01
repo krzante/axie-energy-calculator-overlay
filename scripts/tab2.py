@@ -14,13 +14,15 @@ tab2_data = {
     "win":"0",
     "loss": "0",
     "draw": "0",
-    "slp": "0",
-    "wallet": "",
-    "total_slp": "0",
-    "average_slp": "0",
-    "today_slp": "0",
-    "yesterday_slp": "0",
+    "mmr": "0",
+    "rank": "0", 
+    "total": "0",
+    "average": "0",
+    "today": "0",
+    "yesterday": "0"
 }
+
+wallet = ""
 
 class Tab2:
     def add_to_counter(canvas_arg, field_arg, tab_tags_arg):
@@ -46,53 +48,26 @@ class Tab2:
         canvas_arg.itemconfig(tab_tags_arg['loss'], text = "0")
         canvas_arg.itemconfig(tab_tags_arg['draw'], text = "0")
         Tab2.tab2_save(canvas_arg, tab_tags_arg)
-    
 
-    # def add_to_calc(symbol, screen_arg):
-    #     screen_content = screen_arg.get()
-    #     if screen_content == "0" or screen_content == "None" or screen_content == "ERROR":
-    #         Tab2.clear_calc(screen_arg)
-    #     screen_arg.insert(END, symbol)
-    
-
-    # def del_calc(screen_arg):
-    #     screen_content = screen_arg.get()
-    #     if screen_content != "":
-    #         # https://stackoverflow.com/questions/51733663/how-to-delete-single-character-from-entry-widget-tkinter/51733802
-    #         screen_arg.delete(len(screen_content)-1)
-    
-
-    # def clear_calc(screen_arg):
-    #     pass
-    #     # screen_arg.delete(0, END)
-    
-
-    # def eval_calc(canvas_arg, tab_tags_arg):
-    #     screen_content = tab_tags_arg['calc'].get()
-    #     try:
-    #         tab2_calculation = str(aeval(screen_content))
-    #         Tab2.clear_calc(tab_tags_arg['calc'])
-    #         tab_tags_arg['calc'].insert(INSERT, tab2_calculation)
-    #     except:
-    #         Tab2.clear_calc(tab_tags_arg['calc'])
-    #         tab_tags_arg['calc'].insert(INSERT, "ERROR")
-    #     Tab2.tab2_save(canvas_arg, tab_tags_arg)
-    
     
     def tab2_save(canvas_arg, tab_tags_arg):
         tab2_data["win"] = canvas_arg.itemcget(tab_tags_arg['win'], 'text')
         tab2_data["loss"] = canvas_arg.itemcget(tab_tags_arg['loss'], 'text')
         tab2_data["draw"] = canvas_arg.itemcget(tab_tags_arg['draw'], 'text')
-        screen_content = tab_tags_arg['calc'].get()
-        if screen_content == "" or screen_content == 'None' or screen_content == 'ERROR':
-            tab2_data["slp"] = "0"
-        else:
-            tab2_data["slp"] = screen_content
+
+        tab2_data["mmr"] = canvas_arg.itemcget(tab_tags_arg['mmr'], 'text')
+        tab2_data["rank"] = canvas_arg.itemcget(tab_tags_arg['rank'], 'text')
+        tab2_data["total"] = canvas_arg.itemcget(tab_tags_arg['total'], 'text')
+        tab2_data["average"] = canvas_arg.itemcget(tab_tags_arg['average'], 'text')
+        tab2_data["today"] = canvas_arg.itemcget(tab_tags_arg['today'], 'text')
+        tab2_data["yesterday"] = canvas_arg.itemcget(tab_tags_arg['yesterday'], 'text')
+
         with open('./resources/saves/tab2.json', 'w') as fjson:
             json.dump(tab2_data, fjson)
 
 
     def tab2_load(canvas_arg, tab_tags_args):
+        global wallet
         data = {}
         with open('./resources/saves/tab2.json', 'r') as fjson:
             data = json.load(fjson)
@@ -100,18 +75,28 @@ class Tab2:
         canvas_arg.itemconfig(tab_tags_args['win'], text = data["win"])
         canvas_arg.itemconfig(tab_tags_args['loss'], text = data["loss"])
         canvas_arg.itemconfig(tab_tags_args['draw'], text = data["draw"])
-        # Tab2.clear_calc(tab_tags_args['calc'])
-        # tab_tags_args['calc'].insert(INSERT, str(data['slp']))
 
+        canvas_arg.itemconfig(tab_tags_args['mmr'], text = data["mmr"])
+        canvas_arg.itemconfig(tab_tags_args['rank'], text = data["rank"])
+        canvas_arg.itemconfig(tab_tags_args['total'], text = data["total"])
+        canvas_arg.itemconfig(tab_tags_args['average'], text = data["average"])
+        canvas_arg.itemconfig(tab_tags_args['today'], text = data["today"])
+        canvas_arg.itemconfig(tab_tags_args['yesterday'], text = data["yesterday"])
+    
+
+    def __get_wallet() -> str:
         # Getting the user's ronin address
         with open('./resources/wallet.json', 'r') as fjson:
             data = json.load(fjson)
-
-        tab2_data['wallet'] = data['wallet']
         
+        return str(data['wallet'])
     
 
-    def update_data():
+    def __get_slp_data() -> dict:
+        global wallet
+        wallet = Tab2.__get_wallet()
+
+        # https://rapidapi.com/jchbasco/api/axie-infinity
         conn = http.client.HTTPSConnection("axie-infinity.p.rapidapi.com")
 
         headers = {
@@ -119,12 +104,42 @@ class Tab2:
             'X-RapidAPI-Key': str(os.getenv("RAPIDAPI_KEY"))
             }
 
-        conn.request("GET", "/get-update/{}?id={}".format(str(tab2_data['wallet']), str(tab2_data['wallet'])), headers=headers)
+        conn.request("GET", "/get-update/{}?id={}".format(str(wallet), str(wallet)), headers=headers)
 
         res = conn.getresponse()
         data = res.read()
 
-        dataset = json.loads(data.decode("utf-8"))
-        # print(dataset)
+        # Converts response from string to dictionary
+        return json.loads(data.decode("utf-8"))
+
+
+    def update_data(canvas_arg, tab_tags_args):
+        data = Tab2.__get_slp_data()
+
+        if not 'message' in data.keys():
+            # print(data)
+            canvas_arg.itemconfig(tab_tags_args['mmr'], text = "{:,}".format(int(data['leaderboard']['elo'])))
+            canvas_arg.itemconfig(tab_tags_args['total'], text = "{:,}".format(int(data['slp']['total'])))
+            canvas_arg.itemconfig(tab_tags_args['average'], text = "{:,}".format(int(data['slp']['average'])))
+            canvas_arg.itemconfig(tab_tags_args['today'], text = "{:,}".format(int(data['slp']['todaySoFar'])))
+            canvas_arg.itemconfig(tab_tags_args['yesterday'], text = "{:,}".format(int(data['slp']['yesterdaySLP'])))
+
+            # Adjusting the size of the font based on the user's rank
+            rank = int(data['leaderboard']['rank'])
+            font_and_size = ""
+            if rank <= 99999:
+                font_and_size = "{Aldo the Apache} 24"
+            elif rank <= 999999:
+                font_and_size = "{Aldo the Apache} 18"
+            elif rank <= 9999999:
+                font_and_size = "{Aldo the Apache} 13"
+
+            canvas_arg.itemconfig(tab_tags_args['rank'], font = font_and_size)
+            canvas_arg.itemconfig(tab_tags_args['rank'], text = "{:,}".format(int(rank)))
+
+            Tab2.tab2_save(canvas_arg, tab_tags_args)
+            
+        else:
+            print("ERROR")
         # print(type(dataset))
         # print(dataset['slp']['total'])

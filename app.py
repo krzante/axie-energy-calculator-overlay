@@ -139,7 +139,12 @@ tab2_text_tags = dict({
     'win' : 0,
     'loss' : 0,
     'draw' : 0,
-    'calc' : "",
+    'mmr' : 0,
+    'rank' : 0,
+    'tatal' : 0,
+    'average' : 0,
+    'today' : 0,
+    'yesterday' : 0,
 })
 
 tab2_canvas = Canvas(
@@ -201,19 +206,45 @@ tab2_draw_plus_button = CustomButton.lambda_button(tab2, tab2_plus_button_img, t
 tab2_draw_plus_button.place(x = 243, y = 130, width = 30, height = 32)
 
 tab2_update_button_img = PhotoImage(master=tab2, file = f"./resources/images/buttons/update_button.png")
-tab2_update_button = CustomButton.normal_button(tab2, tab2_update_button_img, t2.update_data)
-# img1 = PhotoImage(file = f"img1.png")
-# b1 = Button(
-#     image = img1,
-#     borderwidth = 0,
-#     highlightthickness = 0,
-#     command = btn_clicked,
-#     relief = "flat")
+tab2_update_button = CustomButton.lambda_button(tab2, tab2_update_button_img, t2.update_data, tab2_canvas, tab2_text_tags)
+tab2_update_button.place(x = 137, y = 404, width = 33, height = 36)
 
-tab2_update_button.place(
-    x = 137, y = 404,
-    width = 33,
-    height = 36)
+tab2_text_tags['mmr'] = tab2_canvas.create_text(
+    100.0, 220.0,
+    text = "0",
+    fill = "#ffffff",
+    font = (default_font, int(24.0)))
+
+tab2_text_tags['rank'] = tab2_canvas.create_text(
+    208.0, 220.0,
+    text = "0",
+    fill = "#ffffff",
+    font = (default_font, int(13.0)))
+
+tab2_text_tags['total'] = tab2_canvas.create_text(
+    100.0, 304,
+    text = "0",
+    fill = "#ffffff",
+    font = (default_font, int(24.0)))
+
+tab2_text_tags['average'] = tab2_canvas.create_text(
+    209.0, 304,
+    text = "0",
+    fill = "#ffffff",
+    font = (default_font, int(24.0)))
+
+tab2_text_tags['today'] = tab2_canvas.create_text(
+    100.0, 368,
+    text = "0",
+    fill = "#ffffff",
+    font = (default_font, int(24.0)))
+
+tab2_text_tags['yesterday'] = tab2_canvas.create_text(
+    209.0, 368,
+    text = "0",
+    fill = "#ffffff",
+    font = (default_font, int(24.0)))
+
 
 #####################################################################################################
 ################################## TAB 3 ############################################################

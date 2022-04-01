@@ -1,10 +1,1 @@
-{
-    "win": "0", 
-    "loss": "0", 
-    "draw": "0", 
-    "slp": "0", 
-    "total_slp": "0",
-    "average_slp": "0",
-    "today_slp": "0",
-    "yesterday_slp": "0"
-}
+{"win": "0", "loss": "0", "draw": "0", "mmr": "0", "rank": "0", "total": "0", "average": "0", "today": "0", "yesterday": "0"}
