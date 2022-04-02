@@ -7,6 +7,7 @@ from tkinter import ttk
 import pyglet
 # from pynput.keyboard import Key, Listener
 import sys
+import os
 
 # Importing Custom functions
 from scripts.create_buttons import CustomButton
@@ -384,6 +385,7 @@ t4.load_opacity(tab4_canvas, window, tab4_text_tags['opacity'])
 
 # Function that is called to properly terminate the program from the background
 def terminate_program():
+    os.system('attrib +h ./resources/saves/time.json')
     window.quit()
 window.protocol('WM_DELETE_WINDOW', terminate_program)
 

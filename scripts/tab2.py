@@ -91,7 +91,6 @@ class Tab2:
 
         rank = int(data["rank"].replace(',', ''))
         Tab2.__resize_rank_text(canvas_arg, tab_tags_args['rank'], rank)
-
         if not Tab2.__check_time_file():
             Tab2.__create_time_file()
         else:
@@ -118,25 +117,25 @@ class Tab2:
 
     def __create_time_file() -> None:
         Tab2.__save_time_file()
-        # open('./resources/saves/time.json', 'w+')
 
-        os.system('attrib +h ./resources/saves/time.json')
-        # print("created file")
+        # os.system('attrib +h ./resources/saves/time.json')
+        print("created file")
 
     
     def __load_time_file() -> None:
         global timeout
+        os.system('attrib -h ./resources/saves/time.json')
         with open('./resources/saves/time.json', 'r') as fjson:
             timeout = json.load(fjson)
-        # print(timeout)
+        print(timeout)
 
     
     def __save_time_file() -> None:
         global timeout
-        os.system('attrib -h ./resources/saves/time.json')
-        with open('./resources/saves/time.json', 'w') as fjson:
-            json.dump(timeout, fjson)
-        os.system('attrib +h ./resources/saves/time.json')
+        # os.system('attrib -h ./resources/saves/time.json')
+        with open('./resources/saves/time.json', 'w+') as ftimeout:
+            json.dump(timeout, ftimeout)
+        # os.system('attrib +h ./resources/saves/time.json')
 
 
 
