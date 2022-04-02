@@ -10,7 +10,6 @@ import sys
 
 # Importing Custom functions
 from scripts.create_buttons import CustomButton
-import scripts.functions as CustomFunction
 from scripts.tab1 import Tab1 as t1
 from scripts.tab2 import Tab2 as t2
 from scripts.tab3 import Tab3 as t3
