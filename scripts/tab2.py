@@ -25,12 +25,13 @@ tab2_data = {
 }
 
 wallet = ""
+date_format_str = '%d/%m/%Y %H:%M:%S.%f'
 timeout = dict({
     'time' : '01/1/0001 00:00:00.000000'
 })
 
 class Tab2:
-    def add_to_counter(canvas_arg, field_arg, tab_tags_arg):
+    def add_to_counter(canvas_arg, field_arg, tab_tags_arg) -> None:
         counter_num = int(canvas_arg.itemcget(field_arg, 'text')) + 1
         if counter_num >= 100:
             canvas_arg.itemconfig(field_arg, font = "{Aldo the Apache} 26")
@@ -38,7 +39,7 @@ class Tab2:
         Tab2.tab2_save(canvas_arg, tab_tags_arg)
         
 
-    def minus_to_counter(canvas_arg, field_arg, tab_tags_arg):
+    def minus_to_counter(canvas_arg, field_arg, tab_tags_arg) -> None:
         counter_num = int(canvas_arg.itemcget(field_arg, 'text'))
         if counter_num != 0:
             counter_num -= 1
@@ -48,14 +49,14 @@ class Tab2:
             Tab2.tab2_save(canvas_arg, tab_tags_arg)
 
 
-    def reset_counters(canvas_arg, tab_tags_arg):
+    def reset_counters(canvas_arg, tab_tags_arg) -> None:
         canvas_arg.itemconfig(tab_tags_arg['win'], text = "0")
         canvas_arg.itemconfig(tab_tags_arg['loss'], text = "0")
         canvas_arg.itemconfig(tab_tags_arg['draw'], text = "0")
         Tab2.tab2_save(canvas_arg, tab_tags_arg)
 
     
-    def tab2_save(canvas_arg, tab_tags_arg):
+    def tab2_save(canvas_arg, tab_tags_arg) -> None:
         tab2_data["win"] = canvas_arg.itemcget(tab_tags_arg['win'], 'text')
         tab2_data["loss"] = canvas_arg.itemcget(tab_tags_arg['loss'], 'text')
         tab2_data["draw"] = canvas_arg.itemcget(tab_tags_arg['draw'], 'text')
@@ -71,7 +72,7 @@ class Tab2:
             json.dump(tab2_data, fjson)
 
 
-    def tab2_load(canvas_arg, tab_tags_args):
+    def tab2_load(canvas_arg, tab_tags_args) -> None:
         global wallet
         data = {}
         with open('./resources/saves/tab2.json', 'r') as fjson:
@@ -88,24 +89,26 @@ class Tab2:
         canvas_arg.itemconfig(tab_tags_args['today'], text = data["today"])
         canvas_arg.itemconfig(tab_tags_args['yesterday'], text = data["yesterday"])
 
-        # Optimize this. It has a duplicate in another function.
-        font_and_size = ""
         rank = int(data["rank"].replace(',', ''))
-        if rank <= 99999:
-            font_and_size = "{Aldo the Apache} 24"
-        elif rank <= 999999:
-            font_and_size = "{Aldo the Apache} 18"
-        elif rank <= 9999999:
-            font_and_size = "{Aldo the Apache} 13"
+        Tab2.__resize_rank_text(canvas_arg, tab_tags_args['rank'], rank)
 
-        canvas_arg.itemconfig(tab_tags_args['rank'], font = font_and_size)
-        canvas_arg.itemconfig(tab_tags_args['rank'], text = "{:,}".format(int(rank)))
-
-        print(Tab2.__check_time_file())
         if not Tab2.__check_time_file():
             Tab2.__create_time_file()
         else:
             Tab2.__load_time_file()
+    
+
+    # Reusable function for resizing the font of the rank number
+    def __resize_rank_text(canvas_arg, rank_tag_arg, rank_arg) -> None:
+        if rank_arg <= 99999:
+            font_and_size = "{Aldo the Apache} 24"
+        elif rank_arg <= 999999:
+            font_and_size = "{Aldo the Apache} 18"
+        elif rank_arg <= 9999999:
+            font_and_size = "{Aldo the Apache} 13"
+
+        canvas_arg.itemconfig(rank_tag_arg, font = font_and_size)
+        canvas_arg.itemconfig(rank_tag_arg, text = "{:,}".format(int(rank_arg)))
     
 
     # Checks if the time.json file exists
@@ -113,22 +116,22 @@ class Tab2:
         return os.path.exists('./resources/saves/time.json')
 
 
-    def __create_time_file():
+    def __create_time_file() -> None:
         Tab2.__save_time_file()
         # open('./resources/saves/time.json', 'w+')
 
         os.system('attrib +h ./resources/saves/time.json')
-        print("created file")
+        # print("created file")
 
     
-    def __load_time_file():
+    def __load_time_file() -> None:
         global timeout
         with open('./resources/saves/time.json', 'r') as fjson:
             timeout = json.load(fjson)
-        print(timeout)
+        # print(timeout)
 
     
-    def __save_time_file():
+    def __save_time_file() -> None:
         global timeout
         os.system('attrib -h ./resources/saves/time.json')
         with open('./resources/saves/time.json', 'w') as fjson:
@@ -138,11 +141,12 @@ class Tab2:
 
 
     def __get_wallet() -> str:
-        # Getting the user's ronin address
-        with open('./resources/wallet.json', 'r') as fjson:
-            data = json.load(fjson)
-        print(str(data['wallet'].replace('ronin:', '0x')))
-        return str(data['wallet'].replace('ronin:', '0x'))
+        with open('./resources/wallet.txt') as fwallet:
+            wallet = fwallet.read()
+        
+        wallet = wallet.replace('"', '')
+        wallet = wallet.replace(' ', '')
+        return str(wallet.replace('ronin:', '0x'))
     
 
     def __get_slp_data() -> dict:
@@ -166,60 +170,55 @@ class Tab2:
         return json.loads(data.decode("utf-8"))
 
 
-    def __timeout_message():
-        return"""
+    def __timeout_message(time_arg) -> str:
+        return """
         The free API has limited requests
         I need to limit request calls
-        ---------------------------------------
+        ------------------------------------------
         Please try again in {} minutes
-        ---------------------------------------
+        ------------------------------------------
         Thank you for understanding
-        """
+        """.format(time_arg)
 
 
-    def update_data(canvas_arg, tab_tags_args):
+    def update_data(canvas_arg, tab_tags_args) -> None:
         if Tab2.__process_timeout(canvas_arg):
             data = Tab2.__get_slp_data()
             if not 'message' in data.keys():
-                # print(data)
-                    canvas_arg.itemconfig(tab_tags_args['mmr'], text = "{:,}".format(int(data['leaderboard']['elo'])))
-                    canvas_arg.itemconfig(tab_tags_args['total'], text = "{:,}".format(int(data['slp']['total'])))
-                    canvas_arg.itemconfig(tab_tags_args['average'], text = "{:,}".format(int(data['slp']['average'])))
-                    canvas_arg.itemconfig(tab_tags_args['today'], text = "{:,}".format(int(data['slp']['todaySoFar'])))
-                    canvas_arg.itemconfig(tab_tags_args['yesterday'], text = "{:,}".format(int(data['slp']['yesterdaySLP'])))
+                canvas_arg.itemconfig(tab_tags_args['mmr'], text = "{:,}".format(int(data['leaderboard']['elo'])))
+                canvas_arg.itemconfig(tab_tags_args['total'], text = "{:,}".format(int(data['slp']['total'])))
+                canvas_arg.itemconfig(tab_tags_args['average'], text = "{:,}".format(int(data['slp']['average'])))
+                canvas_arg.itemconfig(tab_tags_args['today'], text = "{:,}".format(int(data['slp']['todaySoFar'])))
+                canvas_arg.itemconfig(tab_tags_args['yesterday'], text = "{:,}".format(int(data['slp']['yesterdaySLP'])))
 
-                    # Adjusting the size of the font based on the user's rank
-                    rank = int(data['leaderboard']['rank'])
-                    font_and_size = ""
-                    if rank <= 99999:
-                        font_and_size = "{Aldo the Apache} 24"
-                    elif rank <= 999999:
-                        font_and_size = "{Aldo the Apache} 18"
-                    elif rank <= 9999999:
-                        font_and_size = "{Aldo the Apache} 13"
+                # Adjusting the size of the font based on the user's rank
+                rank = int(data['leaderboard']['rank'])
+                Tab2.__resize_rank_text(canvas_arg, tab_tags_args['rank'], rank)
 
-                    canvas_arg.itemconfig(tab_tags_args['rank'], font = font_and_size)
-                    canvas_arg.itemconfig(tab_tags_args['rank'], text = "{:,}".format(int(rank)))
-
-                    Tab2.tab2_save(canvas_arg, tab_tags_args) 
+                Tab2.tab2_save(canvas_arg, tab_tags_args)
+                Tab2.__update_timeout()
             else:
                 messagebox.showinfo(title='ERROR', message="Invalid Wallet Address", parent=canvas_arg)
 
 
-    def __process_timeout(canvas_arg):
-        global timeout
-        date_format_str = '%d/%m/%Y %H:%M:%S.%f'
+    def __process_timeout(canvas_arg) -> bool:
+        global timeout, date_format_str
         startTime = datetime.strptime(timeout['time'], date_format_str)
         currentTime = datetime.now()
         timeLeft = currentTime - startTime
         if timeLeft <= timedelta(minutes=10):
             seconds = timeLeft.seconds
             minutes = (seconds//60)%60 
-            messagebox.showinfo(title='Timeout', message=Tab2.__timeout_message().format(10-minutes), parent=canvas_arg)
+            messagebox.showinfo(title='Timeout', message=Tab2.__timeout_message(10-minutes), parent=canvas_arg)
             return False
         else:
-            # Get current time and convert it from time object to string
-            currentTime = datetime.now()
-            timeout['time'] = currentTime.strftime('%d/%m/%Y %H:%M:%S.%f')
-            Tab2.__save_time_file()
             return True
+    
+
+    def __update_timeout() -> None:
+        global date_format_str
+        # Get current time and convert it from time object to string
+        currentTime = datetime.now()
+        timeout['time'] = currentTime.strftime(date_format_str)
+        Tab2.__save_time_file()
+        return True

@@ -2,7 +2,7 @@ from textwrap import wrap
 import tkinter as tk
 from tkinter import *
 from tkinter import ttk
-from overlay import Window
+# from overlay import Window
 # import numpy
 import pyglet
 # from pynput.keyboard import Key, Listener
@@ -227,19 +227,19 @@ tab2_text_tags['total'] = tab2_canvas.create_text(
     font = (default_font, int(24.0)))
 
 tab2_text_tags['average'] = tab2_canvas.create_text(
-    209.0, 304,
+    209.0, 368,
     text = "0",
     fill = "#ffffff",
     font = (default_font, int(24.0)))
 
 tab2_text_tags['today'] = tab2_canvas.create_text(
-    100.0, 368,
+    209.0, 304,
     text = "0",
     fill = "#ffffff",
     font = (default_font, int(24.0)))
 
 tab2_text_tags['yesterday'] = tab2_canvas.create_text(
-    209.0, 368,
+    100.0, 368,
     text = "0",
     fill = "#ffffff",
     font = (default_font, int(24.0)))

@@ -12,6 +12,7 @@ pynput = "*"
 asteval = "*"
 tk = "*"
 python-dotenv = "*"
+auto-py-to-exe = "*"
 
 [dev-packages]
 
