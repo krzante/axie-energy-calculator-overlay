@@ -8,6 +8,7 @@ from tkinter import messagebox
 load_dotenv()
 import http.client
 import json
+import webbrowser
 
 aeval = Interpreter()
 
@@ -151,6 +152,7 @@ class Tab2:
             Tab2.tab2_save(canvas_arg, tab_tags_arg)
         else:
             messagebox.showinfo(title='ERROR', message="Invalid Wallet Address", parent=canvas_arg)
+            webbrowser.open('https://youtu.be/6Q_6imLGi1k')
     
 
     def __check_changes(canvas_arg, tab_tags_arg, data_arg) -> None:
@@ -166,11 +168,11 @@ class Tab2:
             canvas_arg.itemconfig(tab_tags_arg['mmr'], text = "{:,}".format(int(data_arg['leaderboard']['elo'])))
             message += "MMR -{}\n".format(int(tab2_data["mmr"]) - int(data_arg['leaderboard']['elo']))
 
-        if int(data_arg['leaderboard']['elo']) > int(tab2_data['rank']):
+        if int(data_arg['leaderboard']['rank']) > int(tab2_data['rank']):
             rank = int(data_arg['leaderboard']['rank'])
             Tab2.__resize_rank_text(canvas_arg, tab_tags_arg['rank'], rank)
             message += "RANK +{}\n".format(int(data_arg['leaderboard']['rank']) - int(tab2_data["rank"]))
-        elif int(data_arg['leaderboard']['elo']) < int(tab2_data['rank']):
+        elif int(data_arg['leaderboard']['rank']) < int(tab2_data['rank']):
             if int(tab2_data['rank']) - int(data_arg['leaderboard']['rank']) != 0:
                 rank = int(data_arg['leaderboard']['rank'])
                 Tab2.__resize_rank_text(canvas_arg, tab_tags_arg['rank'], rank)
