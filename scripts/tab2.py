@@ -89,12 +89,15 @@ class Tab2:
         canvas_arg.itemconfig(tab_tags_args['today'], text = data["today"])
         canvas_arg.itemconfig(tab_tags_args['yesterday'], text = data["yesterday"])
 
+        tab2_data["mmr"] = data["mmr"]
+        tab2_data["rank"] = data["rank"]
+        tab2_data["total"] = data["total"]
+        tab2_data["average"] = data["average"]
+        tab2_data["today"] = data["today"]
+        tab2_data["yesterday"] = data["yesterday"]
+
         rank = int(data["rank"].replace(',', ''))
         Tab2.__resize_rank_text(canvas_arg, tab_tags_args['rank'], rank)
-        if not Tab2.__check_time_file():
-            Tab2.__create_time_file()
-        else:
-            Tab2.__load_time_file()
     
 
     # Reusable function for resizing the font of the rank number
@@ -108,35 +111,6 @@ class Tab2:
 
         canvas_arg.itemconfig(rank_tag_arg, font = font_and_size)
         canvas_arg.itemconfig(rank_tag_arg, text = "{:,}".format(int(rank_arg)))
-    
-
-    # Checks if the time.json file exists
-    def __check_time_file() -> bool:
-        return os.path.exists('./resources/saves/time.json')
-
-
-    def __create_time_file() -> None:
-        Tab2.__save_time_file()
-
-        # os.system('attrib +h ./resources/saves/time.json')
-        print("created file")
-
-    
-    def __load_time_file() -> None:
-        global timeout
-        os.system('attrib -h ./resources/saves/time.json')
-        with open('./resources/saves/time.json', 'r') as fjson:
-            timeout = json.load(fjson)
-        print(timeout)
-
-    
-    def __save_time_file() -> None:
-        global timeout
-        # os.system('attrib -h ./resources/saves/time.json')
-        with open('./resources/saves/time.json', 'w+') as ftimeout:
-            json.dump(timeout, ftimeout)
-        # os.system('attrib +h ./resources/saves/time.json')
-
 
 
     def __get_wallet() -> str:
@@ -169,55 +143,55 @@ class Tab2:
         return json.loads(data.decode("utf-8"))
 
 
-    def __timeout_message(time_arg) -> str:
-        return """
-        The free API has limited requests
-        I need to limit request calls
-        ------------------------------------------
-        Please try again in {} minutes
-        ------------------------------------------
-        Thank you for understanding
-        """.format(time_arg)
+    def update_data(canvas_arg, tab_tags_arg) -> None:
+        data = Tab2.__get_slp_data()
+        if not 'message' in data.keys():
+            Tab2.__check_changes(canvas_arg, tab_tags_arg, data)
 
-
-    def update_data(canvas_arg, tab_tags_args) -> None:
-        if Tab2.__process_timeout(canvas_arg):
-            data = Tab2.__get_slp_data()
-            if not 'message' in data.keys():
-                canvas_arg.itemconfig(tab_tags_args['mmr'], text = "{:,}".format(int(data['leaderboard']['elo'])))
-                canvas_arg.itemconfig(tab_tags_args['total'], text = "{:,}".format(int(data['slp']['total'])))
-                canvas_arg.itemconfig(tab_tags_args['average'], text = "{:,}".format(int(data['slp']['average'])))
-                canvas_arg.itemconfig(tab_tags_args['today'], text = "{:,}".format(int(data['slp']['todaySoFar'])))
-                canvas_arg.itemconfig(tab_tags_args['yesterday'], text = "{:,}".format(int(data['slp']['yesterdaySLP'])))
-
-                # Adjusting the size of the font based on the user's rank
-                rank = int(data['leaderboard']['rank'])
-                Tab2.__resize_rank_text(canvas_arg, tab_tags_args['rank'], rank)
-
-                Tab2.tab2_save(canvas_arg, tab_tags_args)
-                Tab2.__update_timeout()
-            else:
-                messagebox.showinfo(title='ERROR', message="Invalid Wallet Address", parent=canvas_arg)
-
-
-    def __process_timeout(canvas_arg) -> bool:
-        global timeout, date_format_str
-        startTime = datetime.strptime(timeout['time'], date_format_str)
-        currentTime = datetime.now()
-        timeLeft = currentTime - startTime
-        if timeLeft <= timedelta(minutes=10):
-            seconds = timeLeft.seconds
-            minutes = (seconds//60)%60 
-            messagebox.showinfo(title='Timeout', message=Tab2.__timeout_message(10-minutes), parent=canvas_arg)
-            return False
+            Tab2.tab2_save(canvas_arg, tab_tags_arg)
         else:
-            return True
+            messagebox.showinfo(title='ERROR', message="Invalid Wallet Address", parent=canvas_arg)
     
 
-    def __update_timeout() -> None:
-        global date_format_str
-        # Get current time and convert it from time object to string
-        currentTime = datetime.now()
-        timeout['time'] = currentTime.strftime(date_format_str)
-        Tab2.__save_time_file()
-        return True
+    def __check_changes(canvas_arg, tab_tags_arg, data_arg) -> None:
+        message = ""
+
+        for key in tab2_data:
+            tab2_data[key] = str(tab2_data[key]).replace(',', '')
+
+        if int(data_arg['leaderboard']['elo']) > int(tab2_data['mmr']):
+            canvas_arg.itemconfig(tab_tags_arg['mmr'], text = "{:,}".format(int(data_arg['leaderboard']['elo'])))
+            message += "MMR +{}\n".format(int(data_arg['leaderboard']['elo']) - int(tab2_data["mmr"]))
+        elif int(data_arg['leaderboard']['elo']) < int(tab2_data['mmr']):
+            canvas_arg.itemconfig(tab_tags_arg['mmr'], text = "{:,}".format(int(data_arg['leaderboard']['elo'])))
+            message += "MMR -{}\n".format(int(tab2_data["mmr"]) - int(data_arg['leaderboard']['elo']))
+
+        if int(data_arg['leaderboard']['elo']) > int(tab2_data['rank']):
+            rank = int(data_arg['leaderboard']['rank'])
+            Tab2.__resize_rank_text(canvas_arg, tab_tags_arg['rank'], rank)
+            message += "RANK +{}\n".format(int(data_arg['leaderboard']['rank']) - int(tab2_data["rank"]))
+        elif int(data_arg['leaderboard']['elo']) < int(tab2_data['rank']):
+            if int(tab2_data['rank']) - int(data_arg['leaderboard']['rank']) != 0:
+                rank = int(data_arg['leaderboard']['rank'])
+                Tab2.__resize_rank_text(canvas_arg, tab_tags_arg['rank'], rank)
+                message += "RANK -{}\n".format(int(tab2_data["rank"]) - int(data_arg['leaderboard']['rank']))
+
+        if int(data_arg['slp']['total']) > int(tab2_data['total']):
+            canvas_arg.itemconfig(tab_tags_arg['total'], text = "{:,}".format(int(data_arg['slp']['total'])))
+            message += "TOTAL SLP +{}\n".format(int(data_arg['slp']['total']) - int(tab2_data['total']))
+        
+        if int(data_arg['slp']['average']) > int(tab2_data['average']):
+            canvas_arg.itemconfig(tab_tags_arg['average'], text = "{:,}".format(int(data_arg['slp']['average'])))
+            message += "AVERAGE SLP +{}\n".format(int(data_arg['slp']['average']) - int(tab2_data['average']))
+        elif int(data_arg['slp']['average']) < int(tab2_data['average']):
+            canvas_arg.itemconfig(tab_tags_arg['average'], text = "{:,}".format(int(data_arg['slp']['average'])))
+            message += "AVERAGE SLP -{}\n".format(int(tab2_data['average']) - int(data_arg['slp']['average']))
+        
+        if int(data_arg['slp']['todaySoFar']) > int(tab2_data['today']):
+            canvas_arg.itemconfig(tab_tags_arg['today'], text = "{:,}".format(int(data_arg['slp']['todaySoFar'])))
+            message += "TODAY SLP +{}\n".format(int(data_arg['slp']['todaySoFar']) - int(tab2_data['today']))
+
+        canvas_arg.itemconfig(tab_tags_arg['yesterday'], text = "{:,}".format(int(data_arg['slp']['yesterdaySLP'])))
+
+        if message != "":
+            messagebox.showinfo(title='UPDATE', message=message, parent=canvas_arg)
