@@ -181,6 +181,9 @@ class Tab2:
         if int(data_arg['slp']['total']) > int(tab2_data['total']):
             canvas_arg.itemconfig(tab_tags_arg['total'], text = "{:,}".format(int(data_arg['slp']['total'])))
             message += "TOTAL SLP +{}\n".format(int(data_arg['slp']['total']) - int(tab2_data['total']))
+        elif int(data_arg['slp']['total']) < int(tab2_data['total']):
+            canvas_arg.itemconfig(tab_tags_arg['total'], text = "{:,}".format(int(data_arg['slp']['total'])))
+            message += "TOTAL SLP -{}\n".format(int(tab2_data['total']) - int(data_arg['slp']['total']))
         
         if int(data_arg['slp']['average']) > int(tab2_data['average']):
             canvas_arg.itemconfig(tab_tags_arg['average'], text = "{:,}".format(int(data_arg['slp']['average'])))
@@ -189,10 +192,7 @@ class Tab2:
             canvas_arg.itemconfig(tab_tags_arg['average'], text = "{:,}".format(int(data_arg['slp']['average'])))
             message += "AVERAGE SLP -{}\n".format(int(tab2_data['average']) - int(data_arg['slp']['average']))
         
-        if int(data_arg['slp']['todaySoFar']) > int(tab2_data['today']):
-            canvas_arg.itemconfig(tab_tags_arg['today'], text = "{:,}".format(int(data_arg['slp']['todaySoFar'])))
-            message += "TODAY SLP +{}\n".format(int(data_arg['slp']['todaySoFar']) - int(tab2_data['today']))
-
+        canvas_arg.itemconfig(tab_tags_arg['today'], text = "{:,}".format(int(data_arg['slp']['todaySoFar'])))
         canvas_arg.itemconfig(tab_tags_arg['yesterday'], text = "{:,}".format(int(data_arg['slp']['yesterdaySLP'])))
 
         if message != "":
