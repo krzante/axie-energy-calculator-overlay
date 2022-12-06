@@ -43,7 +43,7 @@
                 "sha256:a9d73ffcbc6a1345ca2d7949638db46349f5b2b77dac65d6494d45c23628da2c",
                 "sha256:f6b8a34fe9aa406f9813c02990db72ca69ce6a158b5b156d2c41f345016a723d"
             ],
-            "version": "==0.12.19"
+            "version": "~>0.12.2-"
         },
         "bottle-websocket": {
             "hashes": [
@@ -311,7 +311,7 @@
                 "sha256:fb89397013cf302f282f0fc998bb7abf11d49dcff72c8ecb320f76ea6e2c5717"
             ],
             "index": "pypi",
-            "version": "==9.1.0"
+            "version": "~>9.1.1"
         },
         "pycparser": {
             "hashes": [
