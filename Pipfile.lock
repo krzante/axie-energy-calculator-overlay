@@ -119,7 +119,7 @@
                 "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"
             ],
             "markers": "python_version >= '2.6' and python_version not in '3.0, 3.1, 3.2, 3.3'",
-            "version": "==0.18.2"
+            "version": "~>0.18.3"
         },
         "gevent": {
             "hashes": [
@@ -311,7 +311,7 @@
                 "sha256:fb89397013cf302f282f0fc998bb7abf11d49dcff72c8ecb320f76ea6e2c5717"
             ],
             "index": "pypi",
-            "version": "~>9.1.1"
+            "version": "~>9.2.0"
         },
         "pycparser": {
             "hashes": [
@@ -384,7 +384,7 @@
                 "sha256:88fafba4abc2f047e08a188fd4bbc10b0e464592c37b514c19f8f8f88d94450b"
             ],
             "markers": "python_version >= '3.7'",
-            "version": "==61.3.1"
+            "version": "~>65.5.1"
         },
         "six": {
             "hashes": [
