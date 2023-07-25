@@ -311,7 +311,7 @@
                 "sha256:fb89397013cf302f282f0fc998bb7abf11d49dcff72c8ecb320f76ea6e2c5717"
             ],
             "index": "pypi",
-            "version": "~>9.2.0"
+            "version": "~>9.3.0"
         },
         "pycparser": {
             "hashes": [
